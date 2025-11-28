@@ -1,46 +1,45 @@
 pipeline {
     agent any
-
+    environment {
+        REPORTS_DIR = 'C:\\Users\\Administrator\\Desktop\\jmeter_scripts\\day3\\reports'
+        JMX_FILE = 'D:\\Jenkins-pipeline\\Thread Group-simple.jmx'
+    }
+    triggers{
+        cron('H 5 * * 1-5')
+    }
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                // Checkout code from Git repository
-                git url: 'https://github.com/aparnakurupr/Jenkins-pipeline.git', branch: 'main'  // Replace with your repo URL and branch
+                git 'https://github.com/aparnakurupr/Jenkins-pipeline.git'
             }
         }
-
         stage('Run JMeter Test') {
             steps {
                 script {
-                    // Run the JMeter test with a .jmx file
-                    sh """
-                    /path/to/jmeter/bin/jmeter -n -t Thread Group-simple.jmx -l results/test_results.jtl
-                    """  // Adjust JMeter path and .jmx file location
+                    bat "mkdir ${REPORTS_DIR}"
+                    bat "jmeter -j jmeter.save.saveservice.output_format=xml -n -t ${JMX_FILE} -l ${REPORTS_DIR}/results.jtl -e -o ${REPORTS_DIR}/html-report"
                 }
             }
         }
-
-        stage('Archive Results') {
+        stage('Publish Performance Report') {
             steps {
-                // Archive the result file so it can be accessed later
-                archiveArtifacts artifacts: 'results/test_results.jtl', allowEmptyArchive: true
+                script {
+                    if (fileExists("${REPORTS_DIR}/results.jtl")) {
+                        performanceReport parsers: [[$class: 'JMeterCsvParser', glob: "${REPORTS_DIR}/results.jtl"]]
+                    } else {
+                        echo "JMeter results file not found: ${REPORTS_DIR}/results.jtl"
+                    }
+                }
             }
         }
-    }
-
-    post {
-        always {
-            // Optional: Can add post-build actions like notifications or cleanup here
-            echo "JMeter test execution complete."
-        }
+        // stage('Archive Artifacts') {
+        //     steps {
+        //         // Archive the generated .jtl and HTML reports
+        //         archiveArtifacts artifacts: "${REPORTS_DIR}/**", allowEmptyArchive: true
+        //     }
+        // }
     }
 }
-
-
-
-
-
-
 
 
 
