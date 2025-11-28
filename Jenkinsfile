@@ -1,10 +1,56 @@
 pipeline {
-    agent { docker { image 'node:24.11.1-alpine3.22' } }
+    agent any
+
     stages {
-        stage('build') {
+        stage('Checkout') {
             steps {
-                sh 'node --version'
+                // Checkout code from Git repository
+                git url: 'https://github.com/aparnakurupr/Jenkins-pipeline.git', branch: 'main'  // Replace with your repo URL and branch
+            }
+        }
+
+        stage('Run JMeter Test') {
+            steps {
+                script {
+                    // Run the JMeter test with a .jmx file
+                    sh """
+                    /path/to/jmeter/bin/jmeter -n -t Thread Group-simple.jmx -l results/test_results.jtl
+                    """  // Adjust JMeter path and .jmx file location
+                }
+            }
+        }
+
+        stage('Archive Results') {
+            steps {
+                // Archive the result file so it can be accessed later
+                archiveArtifacts artifacts: 'results/test_results.jtl', allowEmptyArchive: true
             }
         }
     }
+
+    post {
+        always {
+            // Optional: Can add post-build actions like notifications or cleanup here
+            echo "JMeter test execution complete."
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
