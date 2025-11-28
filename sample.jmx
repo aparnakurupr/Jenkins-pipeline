@@ -1,37 +1,65 @@
-pipeline {
-    agent any
 
-    stages {
-        stage('Checkout') {
-            steps {
-                // Checkout code from Git repository
-                git url: 'https://github.com/aparnakurupr/Jenkins-pipeline.git', branch: 'main'  // Replace with your repo URL and branch
-            }
-        }
+<?xml version="1.0" encoding="UTF-8"?>
+<TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+  <stringProp name="TestPlan.comments">This is a simple test plan</stringProp>
+  <boolProp name="TestPlan.functional_mode">false</boolProp>
+  <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+  <elementProp name="TestPlan.user_define_classpath" elementType="Collection"/>
+  
+  <!-- Thread Group -->
+  <hashTree>
+    <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+      <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+      <elementProp name="ThreadGroup.main_controller" elementType="LoopController">
+        <boolProp name="LoopController.continue_forever">false</boolProp>
+        <intProp name="LoopController.loops">1</intProp>
+      </elementProp>
+      <stringProp name="ThreadGroup.num_threads">10</stringProp>
+      <stringProp name="ThreadGroup.ramp_time">5</stringProp>
+      <longProp name="ThreadGroup.start_time">1653523000000</longProp>
+      <longProp name="ThreadGroup.end_time">1653526600000</longProp>
+      <boolProp name="ThreadGroup.scheduler">false</boolProp>
+      <stringProp name="ThreadGroup.duration">0</stringProp>
+      <stringProp name="ThreadGroup.delay">0</stringProp>
 
-        stage('Run JMeter Test') {
-            steps {
-                script {
-                    // Run the JMeter test with a .jmx file
-                    sh """
-                    /path/to/jmeter/bin/jmeter -n -t Thread Group-simple.jmx -l results/test_results.jtl
-                    """  // Adjust JMeter path and .jmx file location
-                }
-            }
-        }
+      <!-- HTTP Request -->
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="true">
+          <stringProp name="HTTPSampler.domain">www.example.com</stringProp>
+          <stringProp name="HTTPSampler.port">80</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
 
-        stage('Archive Results') {
-            steps {
-                // Archive the result file so it can be accessed later
-                archiveArtifacts artifacts: 'results/test_results.jtl', allowEmptyArchive: true
-            }
-        }
-    }
+      <!-- View Results Tree -->
+      <hashTree>
+        <ResultCollector guiclass="ResultCollectorGui" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <stringProp name="filename">results.jtl</stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</TestPlan>
 
-    post {
-        always {
-            // Optional: Can add post-build actions like notifications or cleanup here
-            echo "JMeter test execution complete."
-        }
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
