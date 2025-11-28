@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        REPORTS_DIR = 'C:\\Users\\Administrator\\Desktop\\jmeter_scripts\\day3\\reports'
+        REPORTS_DIR = 'D:\\Jenkins-pipeline\\Thread Group-simple\\reports'
         JMX_FILE = 'D:\\Jenkins-pipeline\\Thread Group-simple.jmx'
     }
     triggers{
